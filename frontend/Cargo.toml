@@ -2,7 +2,45 @@
 name = "frontend"
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
+build = "build.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[build-dependencies]
+sitewriter = "0.5.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.81"
+
 
 [dependencies]
+serde = { version = "1.0", features = ["derive"] }
+yew = "0.19.3"
+yew-router = "0.16.0"
+include_dir = "0.7.2"
+pulldown-cmark = "0.9.1"
+serde_json = "1.0.81"
+gloo-utils = "0.1.4"
+wasm-bindgen = "0.2.62"
+stylist = { version = "0.10.1", features = ["yew_integration"] }
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+wasm-bindgen = { version = "0.2.62", default-features = false, optional = true }
+
+[[bin]]
+name = "frontend"
+path = "src/main.rs"
+
+[lib]
+name = "frontend"
+path = "src/lib.rs"
+
+[profile.release]
+# less code to include into binary
+panic = 'abort'
+# optimization over all codebase ( better optimization, slower build )
+codegen-units = 1
+# optimization for size ( more aggressive )
+opt-level = 'z'
+# optimization for size
+# opt-level = 's'
+# link time optimization using using whole-program analysis
+lto = true
