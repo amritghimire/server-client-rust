@@ -7,12 +7,12 @@ use tower::ServiceExt;
 
 #[tokio::test]
 async fn health_check_works() {
-    let app = server::app();
+    let app = server::app(None);
 
     let response = app
         .oneshot(
             Request::builder()
-                .uri("/health_check")
+                .uri("/api/health_check")
                 .body(Body::empty())
                 .unwrap(),
         )
