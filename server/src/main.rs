@@ -1,7 +1,7 @@
-use std::net::{IpAddr, Ipv6Addr, SocketAddr};
-use std::str::FromStr;
 use clap::Parser;
 use server::app;
+use std::net::{IpAddr, Ipv6Addr, SocketAddr};
+use std::str::FromStr;
 
 // Setup the command line interface with clap.
 #[derive(Parser, Debug)]

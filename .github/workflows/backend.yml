@@ -1,11 +1,7 @@
 name: Backend
 on:
-  push:
-    paths:
-      - backend
-  pull_request:
-    paths:
-      - backend
+  - push
+  - pull_request
 
 env:
   CARGO_TERM_COLOR: always

@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - main  # Set a branch name to trigger deployment
-    paths:
-      - frontend
   pull_request:
-    paths:
-      - frontend
 
 jobs:
   check:
@@ -58,7 +54,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: -p frontend--all -- --check
+          args: -p frontend --all -- --check
 
   clippy:
     name: Clippy
