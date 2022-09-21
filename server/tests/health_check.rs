@@ -3,21 +3,17 @@ use axum::{
     http::{Request, StatusCode},
 };
 
-use tower::ServiceExt;
+mod utils;
 
 #[tokio::test]
 async fn health_check_works() {
-    let app = server::app(None);
-
-    let response = app
-        .oneshot(
-            Request::builder()
-                .uri("/api/health_check")
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = utils::run_with_app(
+        Request::builder()
+            .uri("/api/health_check")
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
 
