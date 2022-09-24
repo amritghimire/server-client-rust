@@ -52,4 +52,5 @@ pub async fn app(settings: Settings, db: Option<PgPool>) -> Router {
     router
         .layer(Extension(shared_database))
         .layer(Extension(shared_settings))
+        .layer(TraceLayer::new_for_http())
 }
