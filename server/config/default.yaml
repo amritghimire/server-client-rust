@@ -1,0 +1,12 @@
+application_port: 8000
+database:
+  host: "127.0.0.1"
+  port: 5432
+  username: "postgres"
+  password: "password"
+  database_name: "database"
+application:
+  log_level: "debug"
+  addr: "::1"
+  port: "8080"
+  static_dir: "../dist"
