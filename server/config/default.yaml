@@ -6,6 +6,7 @@ database:
   password: "password"
   database_name: "database"
 application:
+  debug: false
   log_level: "debug"
   addr: "::1"
   port: "8080"

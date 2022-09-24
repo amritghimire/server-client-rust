@@ -67,7 +67,7 @@ async fn main() {
     tracing::debug!("listening on {}", addr);
 
     axum::Server::bind(&addr)
-        .serve(app(Some(settings.application.static_dir)).into_make_service())
+        .serve(app(settings, None).await.into_make_service())
         .await
         .unwrap();
 }

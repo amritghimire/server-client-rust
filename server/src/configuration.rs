@@ -29,6 +29,7 @@ impl DatabaseSettings {
 
 #[derive(Serialize, Deserialize)]
 pub struct ApplicationSettings {
+    pub debug: bool,
     pub log_level: String,
     pub addr: String,
     pub port: u16,

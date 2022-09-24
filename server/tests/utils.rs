@@ -6,26 +6,17 @@ use tower::{Service, ServiceExt};
 
 use server::{configuration::Settings, startup};
 
-use sqlx::{Connection, PgConnection};
+use sqlx::PgPool;
 
-pub async fn get_database() -> PgConnection {
+pub async fn run_with_app(db: PgPool, request: Request<Body>) -> Response {
     let settings = Settings::test().expect("Unable to initialize configuration");
 
-    let database_string = settings.database.connection_string();
-
-    println!("Connecting to database at {}", database_string);
-    let connection = PgConnection::connect(&settings.database.connection_string())
-        .await
-        .expect("Failed to connect to database");
-    connection
-}
-
-pub async fn run_with_app(request: Request<Body>) -> Response {
-    let app = startup::app(None);
+    let app = startup::app(settings, Some(db)).await;
     let response = app.oneshot(request).await.unwrap();
     response
 }
 
+#[allow(dead_code)]
 pub async fn run_request(app: &mut Router, request: Request<Body>) -> Response {
     let response = app.ready().await.unwrap().call(request).await.unwrap();
     response

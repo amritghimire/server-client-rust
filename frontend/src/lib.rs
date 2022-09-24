@@ -117,7 +117,6 @@ impl Model {
 
 fn switch(routes: &Route) -> Html {
     #[allow(clippy::let_unit_value)]
-
     match routes.clone() {
         Route::Post { slug } => html! { <Post slug={slug} /> },
         Route::Posts => html! { <PostList /> },

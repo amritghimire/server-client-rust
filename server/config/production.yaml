@@ -1,2 +1,3 @@
 application:
   log_level: "info"
+  debug: true

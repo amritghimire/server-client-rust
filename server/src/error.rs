@@ -8,6 +8,7 @@ use std::error::Error;
 
 pub enum AppError {
     JsonParsing(JsonRejection),
+    HttpError(StatusCode, String),
 }
 
 impl From<JsonRejection> for AppError {
@@ -16,10 +17,21 @@ impl From<JsonRejection> for AppError {
     }
 }
 
+impl From<sqlx::Error> for AppError {
+    fn from(err: sqlx::Error) -> Self {
+        tracing::error!("Error occurred during database transaction {:?}", err);
+        AppError::HttpError(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Unknown error occurred during your request".to_string(),
+        )
+    }
+}
+
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
             AppError::JsonParsing(err) => handle_json_error(err),
+            AppError::HttpError(code, message) => (code, message),
         };
 
         let body = Json(json!({ "error": error_message }));

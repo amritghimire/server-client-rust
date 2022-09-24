@@ -4,18 +4,20 @@ use axum::{
     http::{header, Request},
 };
 use serde_json::json;
+use server::configuration::Settings;
+use sqlx::PgPool;
 
 mod utils;
 
-#[tokio::test]
-async fn subscribe_returns_a_200_for_valid_form_data() {
+#[sqlx::test]
+async fn subscribe_returns_a_200_for_valid_form_data(db: PgPool) {
     let body = json!({
         "name": "Amrit Ghimire",
         "email": "amrit@example.com"
     });
 
-    let mut database = utils::get_database().await;
     let response = utils::run_with_app(
+        db.clone(),
         Request::post("/api/subscriptions")
             .header(header::CONTENT_TYPE, "application/json")
             .body(Body::from(serde_json::to_vec(&body).unwrap()))
@@ -25,18 +27,37 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     assert_eq!(response.status(), StatusCode::OK);
 
     let saved = sqlx::query!("SELECT email, name FROM subscriptions")
-        .fetch_one(&mut database)
+        .fetch_one(&db)
         .await
         .expect("Failed to fetch saved subscription");
 
     assert_eq!(saved.email, "amrit@example.com");
 
     assert_eq!(saved.name, "Amrit Ghimire");
+
+    let response = utils::run_with_app(
+        db.clone(),
+        Request::post("/api/subscriptions")
+            .header(header::CONTENT_TYPE, "application/json")
+            .body(Body::from(serde_json::to_vec(&body).unwrap()))
+            .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let saved = sqlx::query!("select count(id) from subscriptions;")
+        .fetch_one(&db)
+        .await
+        .expect("Failed to fetch saved subscription count");
+
+    assert_eq!(saved.count, Some(1));
 }
 
-#[tokio::test]
-async fn subscribe_returns_a_400_for_missing_form_data() {
-    let mut app = server::startup::app(None);
+#[sqlx::test]
+async fn subscribe_returns_a_400_for_missing_form_data(db: PgPool) {
+    let settings = Settings::test().expect("Unable to initialize configuration");
+
+    let mut app = server::startup::app(settings, Some(db)).await;
 
     let test_cases = vec![
         (json!({"name": "Amrit Ghimire"}), "missing the email"),

@@ -2,12 +2,14 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
+use sqlx::PgPool;
 
 mod utils;
 
-#[tokio::test]
-async fn health_check_works() {
+#[sqlx::test]
+async fn health_check_works(db: PgPool) {
     let response = utils::run_with_app(
+        db,
         Request::builder()
             .uri("/api/health_check")
             .body(Body::empty())
