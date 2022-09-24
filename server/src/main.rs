@@ -2,8 +2,8 @@ use clap::Parser;
 use std::net::{IpAddr, Ipv6Addr, SocketAddr};
 use std::str::FromStr;
 
-use server::startup::app;
 use server::configuration::Settings;
+use server::startup::app;
 
 // Setup the command line interface with clap.
 #[derive(Parser, Debug)]
@@ -50,14 +50,18 @@ async fn main() {
 
     // Setup logging & RUST_LOG from args
     if std::env::var("RUST_LOG").is_err() {
-        std::env::set_var("RUST_LOG", format!("{},hyper=info,mio=info", settings.application.log_level))
+        std::env::set_var(
+            "RUST_LOG",
+            format!("{},hyper=info,mio=info", settings.application.log_level),
+        )
     }
 
     // initialize tracing
     tracing_subscriber::fmt::init();
 
     let addr = SocketAddr::from((
-        IpAddr::from_str(settings.application.addr.as_str()).unwrap_or(IpAddr::V6(Ipv6Addr::LOCALHOST)),
+        IpAddr::from_str(settings.application.addr.as_str())
+            .unwrap_or(IpAddr::V6(Ipv6Addr::LOCALHOST)),
         settings.application.port,
     ));
     tracing::debug!("listening on {}", addr);

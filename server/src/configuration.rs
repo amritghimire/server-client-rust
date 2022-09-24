@@ -1,14 +1,13 @@
 use config::{Config, ConfigError, Environment, File};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::env;
 
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application: ApplicationSettings
+    pub application: ApplicationSettings,
 }
-
 
 #[derive(Serialize, Deserialize)]
 pub struct DatabaseSettings {
@@ -19,13 +18,21 @@ pub struct DatabaseSettings {
     pub database_name: String,
 }
 
+impl DatabaseSettings {
+    pub fn connection_string(&self) -> String {
+        format!(
+            "postgres://{}:{}@{}:{}/{}",
+            self.username, self.password, self.host, self.port, self.database_name
+        )
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct ApplicationSettings {
     pub log_level: String,
     pub addr: String,
     pub port: u16,
-    pub static_dir: String
+    pub static_dir: String,
 }
 
 impl Settings {
@@ -46,7 +53,13 @@ impl Settings {
     }
 
     pub fn test() -> Result<Self, ConfigError> {
-        Self::load("test".to_string())
+        let s = Config::builder()
+            .add_source(File::with_name("config/default"))
+            .add_source(File::with_name("config/local").required(false))
+            .add_source(Environment::with_prefix("app"))
+            .add_source(File::with_name("config/test").required(true))
+            .build()?;
+
+        s.try_deserialize()
     }
 }
-

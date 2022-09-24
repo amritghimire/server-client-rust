@@ -13,6 +13,8 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
         "name": "Amrit Ghimire",
         "email": "amrit@example.com"
     });
+
+    let mut database = utils::get_database().await;
     let response = utils::run_with_app(
         Request::post("/api/subscriptions")
             .header(header::CONTENT_TYPE, "application/json")
@@ -21,6 +23,15 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions")
+        .fetch_one(&mut database)
+        .await
+        .expect("Failed to fetch saved subscription");
+
+    assert_eq!(saved.email, "amrit@example.com");
+
+    assert_eq!(saved.name, "Amrit Ghimire");
 }
 
 #[tokio::test]
