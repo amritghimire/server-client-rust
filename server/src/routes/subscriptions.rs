@@ -21,7 +21,11 @@ pub async fn subscribe(
     Extension(state): Extension<Arc<State>>,
 ) -> JsonResponse<SubscribeUser> {
     let Json(user) = payload?;
-    tracing::info!("Adding '{}' '{}' as a new subscriber", user.email, user.name);
+    tracing::info!(
+        "Adding '{}' '{}' as a new subscriber",
+        user.email,
+        user.name
+    );
 
     let result = sqlx::query!(
         r#"
@@ -39,7 +43,7 @@ pub async fn subscribe(
         Ok(_) => {
             tracing::info!("New subscriber details has been saved");
             Ok(user.into())
-        },
+        }
         Err(err) => match err {
             sqlx::Error::Database(dbe) if dbe.constraint() == Some("subscriptions_email_key") => {
                 tracing::info!("The subscriber already exists in database");
