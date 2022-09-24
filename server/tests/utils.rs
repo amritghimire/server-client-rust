@@ -5,7 +5,7 @@ use hyper::Body;
 use tower::{Service, ServiceExt};
 
 pub async fn run_with_app(request: Request<Body>) -> Response {
-    let app = server::app(None);
+    let app = server::startup::app(None);
     let response = app.oneshot(request).await.unwrap();
     response
 }

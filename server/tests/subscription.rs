@@ -25,7 +25,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
 #[tokio::test]
 async fn subscribe_returns_a_400_for_missing_form_data() {
-    let mut app = server::app(None);
+    let mut app = server::startup::app(None);
 
     let test_cases = vec![
         (json!({"name": "Amrit Ghimire"}), "missing the email"),
