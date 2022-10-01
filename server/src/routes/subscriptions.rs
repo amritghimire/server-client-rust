@@ -6,7 +6,7 @@ use uuid::Uuid;
 use axum::{routing::post, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SubscribeUser {
     email: String,
     name: String,
@@ -16,6 +16,7 @@ pub fn router() -> Router {
     Router::new().route("/api/subscriptions", post(subscribe))
 }
 
+#[tracing::instrument(name = "Adding a new subscriber", skip(state))]
 pub async fn subscribe(
     payload: JsonPayload<SubscribeUser>,
     Extension(state): Extension<Arc<State>>,
